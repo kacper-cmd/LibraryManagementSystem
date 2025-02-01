@@ -1,0 +1,47 @@
+﻿@inject ILocalStorageService LocalStorage
+@inject IJSRuntime _jsRuntime
+<HeadContent>
+	@if (IsDarkMode)
+	{
+		<link rel="stylesheet" href="DarkMode.css" />
+	}
+</HeadContent>
+<div class="top-row px-4" style="background-color: var(--white-color) !important;">
+	<div class="form-check form-switch">
+		<input class="form-check-input" type="checkbox" id="darkmode" role="switch" checked="@IsDarkMode" @onchange="@OnCheckBoxChange" />
+		<label class="form-check-label" for="darkmode">Dark Mode</label>
+	</div>
+</div>
+
+
+@code {
+	private bool IsDarkMode = false;
+	protected async override Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			var modeName = await LocalStorage.GetItem("themeMode");
+			if (modeName != null)
+			{
+				if (modeName == "dark")
+				{
+					IsDarkMode = true;
+					StateHasChanged();
+				}
+			}
+		}
+
+	}
+	private async Task OnCheckBoxChange(ChangeEventArgs e)
+	{
+		if (e.Value != null)
+		{
+			IsDarkMode = (bool)e.Value;
+			var themeName = string.Empty;
+			if (IsDarkMode) themeName = "dark";
+			var module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/site.js");
+			await module.InvokeVoidAsync("setTheme", themeName);
+			await LocalStorage.SetItem("themeMode", themeName);
+		}
+	}
+}

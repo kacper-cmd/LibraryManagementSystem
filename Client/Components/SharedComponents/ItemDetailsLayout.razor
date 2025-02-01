@@ -1,0 +1,14 @@
+﻿<DetailsComponent BackToList="@BackToList" FormTitle="@FormTitle">
+    @ChildContent
+</DetailsComponent>
+
+@code {
+    [Parameter]
+    public EventCallback BackToList { get; set; }
+
+    [Parameter]
+    public string FormTitle { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

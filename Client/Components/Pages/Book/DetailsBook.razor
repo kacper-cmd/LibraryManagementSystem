@@ -1,0 +1,13 @@
+﻿@page "/books/details/{BookId:guid}"
+
+<ItemDetailsLayout BackToList="@BackToList" FormTitle="@localizer["Books"]">
+    <ItemDetail Label="@localizer["Title"]" Value="@book.Title" />
+    <ItemDetail Label="@localizer["Author"]" Value="@book.Author" />
+    <ItemDetail Label="@localizer["PublishedDate"]" Value="@book.PublishedDate.ToShortDateString()" />
+    <ItemDetail Label="ISBN" Value="@book.ISBN" />
+    <ItemDetail Label="@localizer["Available"]" Value="@(book.Available ? "Yes" : "No")" />
+</ItemDetailsLayout>
+
+@code {
+
+}

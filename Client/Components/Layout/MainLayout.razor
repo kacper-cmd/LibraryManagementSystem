@@ -1,0 +1,75 @@
+﻿@using Client.States
+@using Infrastructure.Constants
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@inherits LayoutComponentBase
+@inject ILocalStorageService LocalStorage
+@inject IJSRuntime _jsRuntime
+@attribute [Authorize]
+<link href="~/toast.css" rel="stylesheet" />
+
+
+<div class="page @GetCssClass()">
+	<Client.Components.Toast.BlazoredToasts Position="Config.ToastPosition.BottomRight"
+											Timeout="10" SuccessClass="success-toast-override" SuccessIconClass="fa fa-thumbs-up"
+											ErrorIconClass="fa fa-bug" />
+	<div class="sidebar">
+		<NavMenu />
+	</div>
+	<main>
+		<div class="top-row px-4 flex justify-content-between bg-blur">
+			<CultureSelector />
+			@* <AuthorizeView Roles="Admin"> *@
+			<DropDown></DropDown>
+			@* <p>Hello : @context.User.FindFirstValue(ClaimTypes.Name)</p> *@
+
+			@*     <AuthorizeView>
+			<Authorized>
+			<div class="text-center"> @localizer["LoggedAs"] @context.User.Identity?.Name.</div>
+			<button class="btn btn-primary" @onclick="() => Logout()"> @localizer["Logout"] </button>
+			</Authorized>
+			<NotAuthorized>
+			<div class="text-center"> @localizer["NotAuthorized"] </div>
+			<a class="btn btn-primary" href="/login"> @localizer["Login"] </a>
+			</NotAuthorized>
+			</AuthorizeView> *@
+		</div>
+		<article class="content px-4">
+			@Body
+		</article>
+	</main>
+</div>
+<div id="blazor-error-ui">
+	An unhandled error has occurred.
+	<a href="" class="reload">Reload</a>
+	<a class="dismiss">🗙</a>
+</div>
+@code {
+	private string theme = "light";
+	async Task Logout()
+	{
+		await LocalStorage.RemoveItem(Constants.JWTTokenName);
+		navigationManager.NavigateTo("/login", forceLoad: true);
+	}
+	//	    await ls.SetItem("themeMode", themeName);
+	protected async override Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			var modeName = await LocalStorage.GetItem("themeMode");
+			if (modeName != null)
+			{
+				var module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/site.js");
+				theme = modeName;
+				StateHasChanged();
+				await module.InvokeVoidAsync("setTheme", modeName);
+
+			}
+		}
+	}
+	private string GetCssClass()
+	{
+		return theme == "dark" ? "dark" : "";
+	}
+
+}

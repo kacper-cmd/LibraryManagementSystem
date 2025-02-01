@@ -1,0 +1,37 @@
+﻿<div class="container-fluid px-2 ">
+	<div class="row">
+		<div class="col-12  px-2 py-2">
+			<div class="align-items-start">
+				<div class="flex-grow-1">
+					<div class="container card  rounded customshadow  d-flex justify-content-center p-4">
+						<div class="row">
+							<div class="col-12">
+								<div class="alert alert-primary d-flex justify-content-center align-items-center bg-color" role="alert">
+									<h4 class="text-white mb-0">
+										<span class="title bg-color" id="textCard" style="color: #ffffff; font-size: 24px; font-weight: bold;">
+											@FormAction -  @FormModelTitle
+										</span>
+									</h4>
+								</div>
+							</div>
+						</div>
+						<div>
+							@ChildContent
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+
+	[Parameter]
+	public RenderFragment ChildContent { get; set; }
+	[Parameter]
+	public string FormModelTitle { get; set; }//users
+	[Parameter]
+	public string FormAction { get; set; }//@localizer["Edit"]
+}
+

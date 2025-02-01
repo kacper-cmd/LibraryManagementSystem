@@ -1,0 +1,57 @@
+﻿@using Infrastructure.Constants
+@using System.Security.Claims
+
+@code {
+    [Parameter]
+    public string? Roles { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await CheckAuthStateWithRedirection();
+    }
+    private async Task CheckAuthStateWithRedirection()
+    {
+        var token = await _localStorageService.GetItem(Constants.JWTTokenName);
+        if (string.IsNullOrEmpty(token))
+        {
+            navigationManager.NavigateTo("/login");
+            return;
+        }
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user == null || user?.Identity?.IsAuthenticated == false)//|| !user.IsInRole("Admin")
+        {
+            navigationManager.NavigateTo("/not-authorized", forceLoad: true);
+            return;
+        }
+        else if (ValidateUserAccessBaseOnRole(user!))
+        {
+            return;
+        }
+    }
+    private bool ValidateUserAccessBaseOnRole(ClaimsPrincipal user )
+    {
+        bool isAuthorized = false;
+        if (!string.IsNullOrWhiteSpace(Roles))
+        {
+            var roles = CustomRoles.ExtractRole(Roles);
+            foreach (var role in roles)
+            {
+                if (user.IsInRole(role))
+                {
+                    isAuthorized = true;
+                    break;
+                }
+                else
+                {
+                    isAuthorized = false;
+                }
+            }
+        }
+        else
+        {
+            isAuthorized = true;
+        }
+        return isAuthorized;
+    }
+
+}

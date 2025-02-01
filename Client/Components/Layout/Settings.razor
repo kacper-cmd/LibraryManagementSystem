@@ -1,0 +1,74 @@
+﻿@page "/settings"
+
+@using System.Security.Claims
+@using Infrastructure.Constants
+
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
+@inject IToastService _toastService
+@inject ILocalStorageService ls	
+
+<h2 class="white-text"><b>Settings</b></h2>
+<hr class="white-horizontal-line" />
+
+<div class="col-12">
+	<div class="row">
+		<input type="button" class="btn btn-primary" value="Save Settings" @onclick="SaveSettings" />
+	</div>
+</div>
+<br />
+<div class="col-12">
+	<div class="row">
+		<div class="form-check">
+			<input type="checkbox" Disabled="@(!IsUserAuthorized)"
+				   @bind="@DarkTheme"
+				   Style="margin-bottom: 20px" id="changedarkmode" />
+			<span>&nbsp; &nbsp;</span>
+			<label class="white-text" for="changedarkmode"> Dark Theme </label>
+		</div>
+
+	</div>
+</div>
+@code {
+	[CascadingParameter]
+	public Task<AuthenticationState> AuthenticationState { get; set; } = default!;
+
+
+	private bool IsUserAuthorized { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			var authState = await AuthenticationState;//_authenticationStateProvider.GetAuthenticationStateAsync();
+			var user = authState.User;
+
+			if (user.Identity is { IsAuthenticated: true })
+			{
+				var claim = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier);
+				IsUserAuthorized = user.IsInRole(CustomRoles.Admin) || user.IsInRole(CustomRoles.Librarian);
+			}
+			else
+			{
+				_navigationManager.NavigateTo("/dashboard");
+			}
+		}
+		catch (Exception ex)
+		{
+		}
+	}
+	private bool DarkTheme { get; set; } = false;
+	private async Task UpdateTheme()
+	{
+		var themeName = DarkTheme ? "dark" : "light";
+		var module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/site.js");
+		await module.InvokeVoidAsync("setTheme", themeName);
+	    await ls.SetItem("themeMode", themeName);
+	}
+
+	private async Task SaveSettings()
+	{
+		await UpdateTheme();
+		_toastService.ShowSuccess("Settings have been saved successfully");
+	}
+}

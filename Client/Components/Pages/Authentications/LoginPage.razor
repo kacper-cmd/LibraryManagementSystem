@@ -1,0 +1,98 @@
+﻿@layout CenteredCardLayout
+@page "/login"
+@using Client.Components.Shared
+
+
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<h2>@localizer["Login"]</h2>
+			<EditForm Model="@Login" OnValidSubmit="LoginClicked">
+				<DataAnnotationsValidator />
+				<div class="form-group">
+					<label class="form-label" for="Email">@localizer["Email"] </label>
+					<InputText class="form-control" @bind-Value="Login.Email"></InputText>
+					<div class="validation-message-placeholder">
+						<ValidationMessage For="@(() => Login.Email)" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="form-label"> @localizer["Password"]</label>
+					<div class="mb-3">
+						<div class="input-group">
+							<InputText type="@inputType" class="form-control" @bind-Value="Login.Password"></InputText>
+							<button style="width:10%;" type="button" @onclick="toggleMasedMode" class="@btnCss" disabled="@(@isDisabled)">
+								@if (isMaskingPassword)
+								{
+									<span title="Show password">
+										<i class="fa-solid fa-eye"></i>
+									</span>
+								}
+								else
+								{
+									<span title="Hide Password">
+										<i class="fa-solid fa-eye-slash"></i>
+									</span>
+								}
+							</button>
+						</div>
+					</div>
+					<div class="validation-message-placeholder">
+						<ValidationMessage For="@(() => Login.Password)" />
+					</div>
+				</div>
+
+				<div class="form-group mt-4 d-flex justify-content-between align-items-center">
+					@if (ShowLoadingButton)
+					{
+						<ButtonLoadingSpinner></ButtonLoadingSpinner>
+					}
+					else
+					{
+						<button type="submit" class="btn btn-primary">@localizer["LoginBtn"]</button>
+					}
+					<span class="text-center">
+						Don't have account ? |
+					<a href="/register" class="me-2">Sign up</a>
+					</span>
+				</div>
+			</EditForm>
+		</div>
+	</div>
+</div>
+
+
+@code {
+	[CascadingParameter] public Task<AuthenticationState> AuthenticationState { get; set; }
+	bool isMaskingPassword = true;
+	string btnCss = "btn btn-outline-primary";
+	string inputType = "password";
+	bool isDisabled = false;
+	async Task toggleMasedMode()
+	{
+		isMaskingPassword = !isMaskingPassword;
+		if (isMaskingPassword)
+		{
+			btnCss = "btn btn-outline-primary";
+			inputType = "password";
+		}
+		else
+		{
+			btnCss = "btn btn-outline-danger";
+			inputType = "text";
+			isDisabled = !isDisabled;
+			await Task.Delay(1000);
+			await toggleMasedMode();
+			isDisabled = !isDisabled;
+		}
+	}
+
+	private async Task CheckUserAuthentication()
+	{
+		var user = (await AuthenticationState).User;
+		bool isUserAuthenticated = user.Identity!.IsAuthenticated;
+		if (isUserAuthenticated)
+			navigationManager.NavigateTo("/dashboard");
+	}
+}
+

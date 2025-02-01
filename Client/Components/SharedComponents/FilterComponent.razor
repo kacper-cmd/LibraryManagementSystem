@@ -1,0 +1,101 @@
+﻿@using Application.RequestModel
+@typeparam TFilter where TFilter : BaseFilter, new()
+
+<div class="row">
+    <div class="col-12 col-md-4">
+        <div class="mb-3">
+            <label for="searchColumn" class="form-label">Search By</label>
+            <select id="searchColumn" class="form-select round" @bind="Filter.SearchColumn">
+                <option value="">@localizer["SelectColumn"]</option>
+                @foreach (var column in Columns)
+                {
+                    <option value="@column.Value">@column.Key</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="mb-3">
+            <label for="searchTerm" class="form-label">@localizer["SearchTerm"]</label>
+            <input type="text" class="form-control round" id="searchTerm" @bind="Filter.SearchTerm">
+        </div>
+
+    </div>
+    <div class="col-12 col-md-4">
+
+        <div class="mb-3">
+            <label for="sortColumn" class="form-label">@localizer["SortBy"]</label>
+            <select id="sortColumn" class="form-select" @bind="Filter.SortColumn">
+                <option value="">@localizer["SelectColumn"] </option>
+                @foreach (var column in Columns)
+                {
+                    <option value="@column.Value">@column.Key</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="mb-3">
+            <label for="sortOrder" class="form-label">@localizer["SortOrder"]</label>
+            <select id="sortOrder" class="form-select" @bind="Filter.SortOrder">
+                <option value="">@localizer["SelectOrder"] </option>
+                @foreach (var order in SortOrders)
+                {
+                    <option value="@order.Value">@order.Key</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="mb-3">
+            <label for="pageSize" class="form-label">@localizer["ItemsPerPage"] </label>
+            <select id="pageSize" class="form-select" @bind="Filter.PageSize">
+                @foreach (var size in PageSizes)
+                {
+                    <option value="@size">@size</option>
+                }
+            </select>
+        </div>
+    </div>
+
+
+    <div class="col-12">
+        <div class="d-flex">
+            <div class="field-button-container">
+                <button class="btn btn-danger btn-sm" type="button" @onclick="OnClearFilter">
+                    @localizer["Clear"]
+                    <i class="fas fa-times-circle"></i>
+                </button>
+            </div>
+            <div class="field-button-container filter-button">
+                <button class="btn btn-primary btn-sm" type="button" @onclick="OnApplyFilter">@localizer["Filter"]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@code {
+    [Parameter]
+    public EventCallback<TFilter> OnSearch { get; set; }
+    [Parameter]
+    public TFilter Filter { get; set; }
+    private List<int> PageSizes = new List<int> { 5, 10, 20, 50 };
+    [Parameter]
+    public Dictionary<string, string> Columns { get; set; }
+    [Parameter]
+    public Dictionary<string, string> SortOrders { get; set; }
+    private async Task OnApplyFilter()
+    {
+        await OnSearch.InvokeAsync(Filter);
+    }
+
+    private async Task OnClearFilter()
+    {
+        Filter = new TFilter();
+        await OnSearch.InvokeAsync(Filter);
+    }
+}
+

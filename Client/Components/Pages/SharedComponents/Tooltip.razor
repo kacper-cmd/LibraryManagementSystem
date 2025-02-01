@@ -1,0 +1,20 @@
+﻿<div class="tooltip-wrapper">
+    <span class="tooltip-text @TooltipPositionClass"> @((MarkupString)Text)</span>
+    @ChildContent
+</div>
+
+@code {
+    [Parameter] public string Text { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public string Position { get; set; } = "bottom";
+
+
+    private string TooltipPositionClass => Position switch
+    {
+        "top" => "tooltip-top",
+        "right" => "tooltip-right",
+        "left" => "tooltip-left",
+        _ => "tooltip-bottom"
+    };
+}
+

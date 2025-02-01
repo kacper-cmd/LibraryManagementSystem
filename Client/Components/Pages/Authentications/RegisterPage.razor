@@ -1,0 +1,65 @@
+﻿@layout CenteredCardLayout
+@page "/register"
+@using Client.Components.Shared
+@rendermode InteractiveServer
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<h2>@localizer["Register"]</h2>
+			<EditForm Model="@Register" OnValidSubmit="RegisterClicked">
+				<DataAnnotationsValidator />
+				<div class="form-group">
+					<label class="form-label">@localizer["Name"]</label>
+					<InputText class="form-control" @bind-Value="Register.Name"></InputText>
+					<div class="validation-message-placeholder">
+						<ValidationMessage For="@(() => Register.Name)" />
+					</div>
+
+				</div>
+				<div class="form-group">
+					<label class="form-label">@localizer["Email"]</label>
+					<InputText class="form-control" @bind-Value="Register.Email"></InputText>
+					<div class="validation-message-placeholder">
+						<ValidationMessage For="@(() => Register.Email)" />
+					</div>
+
+				</div>
+				<div class="form-group">
+					<label class="form-label">@localizer["Password"]</label>
+					<InputText class="form-control" @bind-Value="Register.Password"></InputText>
+					<div class="validation-message-placeholder">
+						<ValidationMessage For="@(() => Register.Password)" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="form-label">
+						@localizer["ConfirmPassword"]
+					</label>
+					<InputText class="form-control" @bind-Value="Register.ConfirmPassword"></InputText>
+					<div class="validation-message-placeholder">
+						<ValidationMessage For="@(() => Register.ConfirmPassword)" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="form-label">   @localizer["Role"]</label>
+					<InputText class="form-control" @bind-Value="Register.Role"></InputText>
+					<div class="validation-message-placeholder">
+						<ValidationMessage For="@(() => Register.Role)" />
+					</div>
+				</div>
+
+				<div class="form-group mt-4 d-flex justify-content-end align-items-end">
+					@if (ShowLoadingButton)
+					{
+						<ButtonLoadingSpinner></ButtonLoadingSpinner>
+					}
+					else
+					{
+						<button type="submit" class="btn btn-primary float-end"> @localizer["RegisterBtn"]</button>
+					}
+				</div>
+			</EditForm>
+		</div>
+	</div>
+</div>
+

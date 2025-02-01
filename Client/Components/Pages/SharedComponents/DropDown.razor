@@ -1,0 +1,56 @@
+﻿@using Infrastructure.Constants
+@inject ILocalStorageService LocalStorage
+@inject IJSRuntime _jsRuntime
+
+
+<AuthorizeView>
+	<Authorized>
+		<div class="text-center"> @localizer["LoggedAs"] @context.User.Identity?.Name.</div>
+	</Authorized>
+	<NotAuthorized>
+		<div class="text-center"> @localizer["NotAuthorized"] </div>
+		<a class="btn btn-primary" href="/login"> @localizer["Login"] </a>
+	</NotAuthorized>
+</AuthorizeView>
+
+<div class="btn-group">
+	<img src="../box-arrow-right.svg" width="30" height="40" />
+	<button type="button" class="btn btn-none border-0 dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+		<span class="visually-hidden">Toogle dropdown</span>
+	</button>
+	<ul class="dropdown-menu mt-2 border-0">
+		<li>
+			<div class="card">
+				<div class="card-body">
+					<ul class="list-group">
+						<li class="list-group-item">
+							<a class="text-primary fw-bold float-start text-decoration-none" href="/users" style="cursor:pointer;">
+								<i class="bi bi-person-gear"></i>
+								@localizer["Users"]
+							</a>
+						</li>
+					</ul>
+					<ul class="list-group">
+						<li class="list-group-item">
+							<Client.Components.Shared.DarkModeSwitch/>
+						</li>
+					</ul>
+				</div>
+				<dicv class="card-footer">
+					<button class="btn btn-primary btn-sm fw-bold w-100" @onclick="LogoutClicked">
+						<i class="bi bi-box-arrow-left"></i>
+						@localizer["Logout"]
+					</button>
+				</dicv>
+			</div>
+		</li>
+	</ul>
+</div>
+
+@code {
+	async Task LogoutClicked()
+	{
+		await LocalStorage.RemoveItem(Constants.JWTTokenName);
+		navigationManager.NavigateTo("/login", forceLoad: true);
+	}
+}

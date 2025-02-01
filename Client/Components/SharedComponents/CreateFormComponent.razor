@@ -1,0 +1,61 @@
+﻿@typeparam TModel
+
+
+
+<div class="container-fluid" style="padding: 1rem 1.25rem;">
+	<div class="row">
+		<div class="col-12 d-flex px-2 py-2">
+				<div class="card flex-fill border-0 mt-1 position-relative">
+					<div class="align-items-start">
+						<div class="flex-grow-1">
+						 <div class="container card  rounded customshadow  d-flex justify-content-center p-4">
+								<div class="row">
+									<div class="col-12">
+										<div class="alert alert-primary d-flex justify-content-center align-items-center bg-color" role="alert">
+											<h4 class="text-white mb-0">
+												<span class="title bg-color" id="textCard" style="color: #ffffff; font-size: 24px; font-weight: bold;">
+													@localizer["AddNew"]-  @FormTitle
+												</span>
+											</h4>
+										</div>
+									</div>
+								</div>
+								<div>
+									<EditForm Model="@Model" OnValidSubmit="@OnValidSubmit" Enhance>
+										<div class="row mt-3">
+											<div class="col-6">
+												<button type="submit" class="btn btn-primary btn-sm">@localizer["Save"]</button>
+												<button type="button" class="btn btn-secondary btn-sm" @onclick="@Cancel">
+													@localizer["Cancel"]
+												</button>
+											</div>
+										</div>
+										<DataAnnotationsValidator />
+										<ValidationSummary />
+
+										@ChildContent
+									</EditForm>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+</div>
+
+@code {
+	[Parameter]
+	public TModel Model { get; set; }
+
+	[Parameter]
+	public EventCallback OnValidSubmit { get; set; }
+
+	[Parameter]
+	public EventCallback Cancel { get; set; }
+
+	[Parameter]
+	public RenderFragment ChildContent { get; set; }
+	[Parameter] public string FormTitle { get; set; }
+
+}

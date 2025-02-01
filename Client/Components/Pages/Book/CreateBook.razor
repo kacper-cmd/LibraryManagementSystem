@@ -1,0 +1,17 @@
+﻿@page "/books/create"
+
+<AuthorizeView>
+	<Authorized>
+		<BookForm Book="@book" OnValidSubmit="HandleValidSubmit" Cancel="Cancel" ButtonText="@(localizer["Save"])"
+				  FormTitle="@(@localizer["AddNew"])" DisplayFileUploaded="true" FileUploaded="@FileUploaded" Errors="messages"  />
+	</Authorized>
+	<NotAuthorized>
+		<RedirectToLogin />
+	</NotAuthorized>
+</AuthorizeView>
+
+
+
+@code {
+
+}

@@ -1,0 +1,20 @@
+﻿@page "/books/edit/{BookId:guid}"
+@using Client.Components.Pages.Authentications
+@using Infrastructure.Constants
+
+<RoleBasedAuthorization Role="@CustomRoles.Librarian">
+	<AllowAccess>
+		@if (book != null)
+		{
+			<BookForm Book="@book" OnValidSubmit="HandleValidSubmit" Cancel="Cancel" ButtonText="@(localizer["Save"])"
+					  FormTitle="@(@localizer["Edit"])" />
+		}
+	</AllowAccess>
+	<Forbidden>
+        <p>You do not have access to this page.</p>
+	</Forbidden>
+</RoleBasedAuthorization>
+
+
+
+

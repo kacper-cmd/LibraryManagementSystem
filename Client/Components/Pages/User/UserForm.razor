@@ -1,0 +1,41 @@
+﻿@inherits ComponentBase
+@using Application.DTOs
+@using Blazored.FluentValidation
+@using Client.Components.Shared
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components
+
+<FormWrapper FormModelTitle="@(@localizer["Users"])" FormAction="@FormTitle">
+	<EditForm Model="@User" OnValidSubmit="HandleSubmit">
+		<FluentValidationValidator @ref="@_fluentValidationValidator" />
+		<div class="row mt-3">
+			<div class="col-6">
+				<button type="submit" class="btn btn-primary btn-sm">@ButtonText</button>
+				<button type="button" class="btn btn-secondary btn-sm" @onclick="@Cancel">
+					@localizer["Cancel"]
+				</button>
+			</div>
+		</div>
+		<div class="row mt-3">
+			<div class="col-12 mt-2 mt-lg-0">
+                <label for="Name" class="form-label">@localizer["Name"]</label>
+				<InputText id="Name" class="form-control" @bind-Value="@User.Name" />
+				<ValidationMessage For="@(() => User.Name)" />
+			</div>
+		</div>
+		<div class="row mt-3">
+			<div class="col-12 mt-2 mt-lg-0">
+				<label for="email" class="form-label">@localizer["Email"]</label>
+				<InputText id="email" class="form-control" @bind-Value="@User.Email" />
+				<ValidationMessage For="@(() => User.Email)" />
+			</div>
+		</div>
+		<div class="row mt-3">
+			<div class="col-12 mt-2 mt-lg-0">
+				<label for="role" class="form-label">@localizer["Role"]</label>
+				<InputText id="role" class="form-control" @bind-Value="@User.Role" />
+				<ValidationMessage For="@(() => User.Role)" />
+			</div>
+		</div>
+	</EditForm>
+</FormWrapper>

@@ -1,0 +1,10 @@
+﻿@page "/users/details/{UserId:guid}"
+
+<ItemDetailsLayout BackToList="@BackToList" FormTitle="@localizer["Users"]">
+    <ItemDetail Label="@localizer["Name"]" Value="@user.Name" />
+    <ItemDetail Label="@localizer["Email"]" Value="@user.Email" />
+    <ItemDetail Label="@localizer["Role"]" Value="@user.Role" />
+</ItemDetailsLayout>
+
+@code {
+}

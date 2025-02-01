@@ -1,0 +1,189 @@
+﻿@page "/users"
+@using Application.RequestModel
+@using Client.Components.Pages.Accordion
+@using Client.Components.Pages.Authentications
+@using Client.Components.Pages.Modal
+@using Infrastructure.Constants
+<CheckAuthState />
+<div class="container-fluid px-2">
+	<div class="row">
+		<div class="col-12  px-2 py-2">
+			<div class="position-relative">
+				<div class="rounded p-3 customshadow">
+					<Accordion CardHeaderTitle="@localizer["Filters"]">
+						<CardHeader>
+						</CardHeader>
+						<CardBody>
+							<FilterComponent TFilter="@BaseFilter" filter="@filter" columns="@columns" sortOrders="@sortOrders" OnSearch="@Filter" />
+						</CardBody>
+					</Accordion>
+					@if (IsLoading)
+					{
+						<Client.Components.Pages.SharedComponents.Loader />
+					}
+					<div class="container-fluid" style="padding: 1rem 1.25rem;">
+						<div class="row">
+							<div class="card flex-fill border-0 mt-1">
+								<div class="card-body py-4">
+									<div class="flex-grow-1">
+										<div class="table-responsive">
+											<div class="d-flex justify-content-between align-items-center mb-3">
+												<div>
+													<div class="field field-button-container">
+														<button @onclick="ExportToExcel" class="btn btn-primary btn-sm" type="button" style="font-size: 14px;">
+															<i class="fa-solid fa-file-excel"></i>
+														</button>
+														<button @onclick="ExportToPdf" class="btn btn-primary btn-sm" type="button" style="font-size: 14px;">
+															<i class="fa-solid fa-file-pdf"></i>
+														</button>
+														<button @onclick="ExportToCsv" class="btn btn-primary btn-sm" type="button" style="font-size: 14px;">
+															<i class="fa-solid fa-file-csv"></i>
+														</button>
+													</div>
+												</div>
+												<div class="text-center flex-grow-1">
+													<span class="table-title" id="table-title" style=" font-size: 14px;">@localizer["Users"]	</span>
+												</div>
+											</div>
+											<div class="d-flex justify-content-between align-items-center mb-3">
+												<div class="d-flex align-items-center">
+													<label for="pageSize" class="form-label me-2 mb-0">Show</label>
+													<select id="pageSize" class="form-select form-select-sm me-2" style="width: auto;" @bind="filter.PageSize" @bind:event="oninput" @onchange="OnPageSizeChange">
+														@foreach (var size in pageSizes)
+														{
+															<option value="@size">@size</option>
+														}
+													</select>
+													<span>entries</span>
+												</div>
+												<div class="d-flex align-items-center mx-1">
+													<label for="searchTerm" class="form-label me-2 mb-0">@localizer["Search"]</label>
+													<input type="search" class="form-control form-control-sm" id="searchTerm" @bind="filter.SearchTerm" @onkeydown="@Enter">
+												</div>
+											</div>
+											<table class="table table-hover table-bordered  mt-3">
+												<thead>
+													<tr>
+														<th class="text-center-column" @onclick='() => SortColumn("Name")'>
+															<div class="header-content">
+																@localizer["Name"]	 <span class="clickable-icon"><i class="@GetSortIcon("Name")"></i></span>
+															</div>
+														</th>
+														<th class="text-center-column" @onclick='() => SortColumn("Email")'>
+															<div class="header-content">
+																@localizer["Email"] <span class="clickable-icon"><i class="@GetSortIcon("Email")"></i></span>
+															</div>
+														</th>
+														<th class="text-center-column" @onclick='() => SortColumn("Role")'>
+															<div class="header-content">
+																@localizer["Role"] <span class="clickable-icon"><i class="@GetSortIcon("Role")"></i></span>
+															</div>
+														</th>
+														<th class="text-center-column" style="width: 12%;">
+															<div class="header-content">
+															</div>
+														</th>
+													</tr>
+												</thead>
+												<tbody>
+													@if (users.Count() > 0)
+													{
+														@foreach (var user in users)
+														{
+															<tr class="@(selectedUserId == user.ID ? "table-primary" : "")" @ondblclick="() => ViewDetails(user.ID)" @onclick="() => SelectUser(user.ID)">
+																<td>@user.Name</td>
+																<td>@user.Email</td>
+																<td>@user.Role</td>
+																<td class="d-flex justify-content-center align-items-center">
+																	<button class="btn btn-sm" @onclick:stopPropagation="true" @onclick="()=> ViewDetails(user.ID)">
+																		<i class="fa-solid fa-circle-info icon-primary"></i>
+																	</button>
+																	<RoleBasedAuthorization Role="@CustomRoles.AdminOrLibrarian">
+																		<AllowAccess>
+																			<button class="btn btn-sm" @onclick:stopPropagation="true" @onclick="()=> EditUser(user.ID)">
+																				<i class="fa-solid fa-pencil fa-sm icon-primary"></i>
+																			</button>
+																			<button class="btn btn-sm" @onclick:stopPropagation="true" @onclick="()=> OpenDeleteDialog(user.ID)">
+																				<i class="fa-solid fa-trash fa-sm icon-warning"></i>
+																			</button>
+																		</AllowAccess>
+																		<Forbidden></Forbidden>
+																	</RoleBasedAuthorization>
+																</td>
+															</tr>
+														}
+													}
+													else
+													{
+														<tr>
+															<td colspan="4" class="text-center">
+																@localizer["NoItemsFind"]
+															</td>
+														</tr>
+													}
+												</tbody>
+											</table>
+										</div>
+									</div>
+									@if (users.Count() > 0)
+									{
+										<div class="d-flex justify-content-between align-items-center mb-3">
+											<div class="d-flex align-items-center">
+												<p>
+													Showing @startEntry to @endEntry of @totalEntries entries
+												</p>
+											</div>
+											<div class="d-flex align-items-center ms-auto">
+												<nav aria-label="Pagination">
+													<ul class="pagination mb-0">
+														<li class="page-item @(pageList.HasPreviousPage ? "" : "disabled")">
+															<button class="page-link" @onclick="GoToFirstPage" disabled="@(!pageList.HasPreviousPage)">
+																<i class="fas fa-angle-double-left"></i>
+															</button>
+														</li>
+														<li class="page-item @(pageList.HasPreviousPage ? "" : "disabled")">
+															<button class="page-link" @onclick="PreviousPage" disabled="@(!pageList.HasPreviousPage)">
+																<i class="fas fa-angle-left"></i>
+															</button>
+														</li>
+														@for (int i = startPage; i <= endPage; i++)
+														{
+															var currentPage = i;
+															<li class="page-item @(currentPage == filter.Page ? "active" : "")">
+																<button class="page-link" @onclick="@(async () => await GoToPage(currentPage))" style="@(currentPage == filter.Page ? "background-color: #ccd2d8;" : "")">
+																	@currentPage
+																</button>
+															</li>
+														}
+														<li class="page-item @(pageList.HasNextPage ? "" : "disabled")">
+															<button class="page-link" @onclick="NextPage" disabled="@(!pageList.HasNextPage)">
+																<i class="fas fa-angle-right"></i>
+															</button>
+														</li>
+														<li class="page-item @(pageList.HasNextPage ? "" : "disabled")">
+															<button class="page-link" @onclick="GoToLastPage" disabled="@(!pageList.HasNextPage)">
+																<i class="fas fa-angle-double-right"></i>
+															</button>
+														</li>
+													</ul>
+												</nav>
+											</div>
+										</div>
+									}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+@if (DeleteDialogOpen)
+{
+	<ModalDialog Title="@localizer["AreYouSure"]"
+				 Text="@localizer["DoYouWantToDeleteThisEntry"]"
+				 OnClose="@OnDeleteDialogClose"
+				 DialogType="ModalDialog.ModalDialogType.DeleteCancel">
+	</ModalDialog>
+}

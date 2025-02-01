@@ -1,0 +1,56 @@
+﻿@using System.IdentityModel.Tokens.Jwt
+@using Infrastructure.Constants
+@using System.Security.Claims
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ILocalStorageService LocalStorageService
+
+@code {
+    [Parameter] public string Role { get; set; }
+    [Parameter] public RenderFragment AllowAccess { get; set; }
+    [Parameter] public RenderFragment Forbidden { get; set; }
+    private bool isAuthorized;
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user?.Identity?.IsAuthenticated == true) //|| !user.IsInRole("Admin"))
+        {
+            var token = await LocalStorageService.GetItem(Constants.JWTTokenName);
+            if (!string.IsNullOrEmpty(token))
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+                var roleClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+
+                if (roleClaim != null)
+                {
+                    var roles = CustomRoles.ExtractRole(Role);
+                    foreach(var role in roles)
+                    {
+                        //isAuthorized = roleClaim.Value == Role;
+                        if (roleClaim.Value == role)
+                        {
+                            isAuthorized = true;
+                            break;
+                        }
+                        else
+                        {
+                            isAuthorized =false;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@if (isAuthorized)
+{
+    @AllowAccess
+}
+else
+{
+    @Forbidden
+}

@@ -1,0 +1,15 @@
+﻿@page "/users/edit/{UserId:guid}"
+@using Client.Components.Pages.Authentications
+@using Infrastructure.Constants
+
+<RoleBasedAuthorization Role="@CustomRoles.Librarian">
+	<AllowAccess>
+		@if (user != null)
+		{
+			<UserForm User="user" OnValidSubmit="HandleValidSubmit" Cancel="Cancel" ButtonText="@(localizer["Save"])" FormTitle="@(@localizer["Edit"])" />
+		}
+	</AllowAccess>
+	<Forbidden>
+		<p>You do not have access to this page.</p>
+	</Forbidden>
+</RoleBasedAuthorization>

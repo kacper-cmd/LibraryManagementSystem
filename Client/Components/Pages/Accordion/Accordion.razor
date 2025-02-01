@@ -1,0 +1,40 @@
+﻿<div class="px-2">
+	<div class="card">
+		<div class="card-header bg-color">
+			<div class="row">
+				<div class="col">
+					<button @onclick="Toggle" type="button" class="btn btn-link w-100 text-left d-flex align-items-center justify-content-between bg-color white-color-text"
+							style="text-decoration: none;">
+						<h6>@CardHeaderTitle</h6>
+					</button>
+					@CardHeader
+				</div>
+				<div class="col-auto d-flex align-items-center">
+
+					<button @onclick="Toggle" type="button" class="btn btn-sm">
+						<i class="@BtnClass"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+		@if (ShowCardBody)
+		{
+			<div class="card-body">
+				@CardBody
+			</div>
+		}
+	</div>
+</div>
+
+@code {
+	[Parameter] public RenderFragment CardBody { get; set; }
+	[Parameter] public RenderFragment CardHeader { get; set; }
+	[Parameter] public string CardHeaderTitle { get; set; }
+
+	[Parameter] public bool ShowCardBody { get; set; } = false;
+	public string BtnClass => ShowCardBody ? "fa-solid fa-caret-up" : "fa-solid fa-caret-down";
+	public void Toggle()
+	{
+		ShowCardBody = !ShowCardBody;
+	}
+}

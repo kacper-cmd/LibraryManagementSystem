@@ -1,0 +1,76 @@
+﻿@inherits ComponentBase
+@using Application.DTOs
+@using Blazored.FluentValidation
+@using Client.Components.Shared
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components
+
+<FormWrapper FormModelTitle="@(@localizer["Books"])" FormAction="@FormTitle">
+	<EditForm Model="@Book" OnValidSubmit="HandleSubmit">
+		<FluentValidationValidator @ref="@_fluentValidationValidator" />
+		<div class="row mt-3">
+			<div class="col-6">
+				<button type="submit" class="btn btn-primary btn-sm">@ButtonText</button>
+				<button type="button" class="btn btn-secondary btn-sm" @onclick="@Cancel">
+					@localizer["Cancel"]
+				</button>
+			</div>
+		</div>
+		<div class="row mt-3">
+			<div class="col-12  mt-2 mt-lg-0">
+				<label for="title" class="form-label">@localizer["Title"]</label>
+				<InputText id="title" class="form-control" @bind-Value="Book.Title" />
+				<ValidationMessage For="@(() => Book.Title)" />
+			</div>
+		</div>
+		<div class="row mt-3">
+			<div class="col-12  mt-2 mt-lg-0">
+				<label for="author" class="form-label">@localizer["Author"]</label>
+				<InputText id="author" class="form-control" @bind-Value="Book.Author" />
+				<ValidationMessage For="@(() => Book.Author)" />
+			</div>
+		</div>
+		<div class="row mt-3">
+			<div class="col-12 mt-2 mt-lg-0">
+				<label for="publishedDate" class="form-label">@localizer["PublishedDate"]</label>
+				<InputDate id="publishedDate" class="form-control" @bind-Value="Book.PublishedDate" />
+				<ValidationMessage For="@(() => Book.PublishedDate)" />
+			</div>
+		</div>
+		<div class="row mt-3">
+			<div class="col-12 mt-2 mt-lg-0">
+				<label for="isbn" class="form-label">ISBN</label>
+				<InputText id="isbn" class="form-control" @bind-Value="Book.ISBN" />
+				<ValidationMessage For="@(() => Book.ISBN)" />
+			</div>
+		</div>
+		<div class="row mt-3">
+			<div class="col-12  mt-2 mt-lg-0">
+				<label for="available" class="form-label">@localizer["Available"]</label>
+				<InputCheckbox id="available" class="form-check-input" @bind-Value="Book.Available" />
+				<ValidationMessage For="@(() => Book.Available)" />
+			</div>
+		</div>
+		@if (DisplayFileUploaded)
+		{
+			<div class="row mt-3">
+				<div class="col-12 mt-2 mt-lg-0">
+					<label class="form-label">Or add from excel file</label>
+					<InputFile class="form-control w-100" accept=".xlsx" OnChange="HandleFileChange" />
+				</div>
+			</div>
+		}
+		<ul style="list-style:none" class="m-2 text-danger">
+			@if (Errors is not null && Errors.Count >0 )
+			{
+				@foreach (var message in Errors)
+				{
+					<li>
+						@message
+					</li>
+				}
+			}
+		</ul>
+	</EditForm>
+</FormWrapper>
+
