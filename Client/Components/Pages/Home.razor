@@ -16,16 +16,22 @@
         </div>
     </BodyContent>
     <FooterContent>
-          <div class="d-flex justify-content-end align-items-end">
+        <div class="d-flex justify-content-end align-items-end">
 
             <button class="ok-button" @onclick="@(() => dialogShown = false)">Ok</button>
-          </div>
+        </div>
     </FooterContent>
 </Client.Components.Pages.Modal.ModalPopup>
 
 
+<button class="btn btn-primary" @onclick="(args)=>DisplayCard(args)">Display</button>
+
+<PopupCard @ref="card"  Title="My " FadeMs="500" Width="350px" Height="auto">
+    Hi I'm Kacper and I'm a software developer
+</PopupCard>
 
 @code{
+
     [CascadingParameter]
     public Task<AuthenticationState> AuthStateTask { get; set; }
     protected override async Task OnInitializedAsync()
@@ -33,7 +39,7 @@
         var authState = await AuthStateTask;
         var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var userEmail = authState.User.FindFirst(ClaimTypes.Email)?.Value;
-       await CheckUserAuthentication();
+        await CheckUserAuthentication();
     }
     private async Task CheckUserAuthentication()
     {
@@ -47,5 +53,10 @@
     private void ShowDialog()
     {
         dialogShown = true;
+    }
+
+    PopupCard card;
+    public void DisplayCard(MouseEventArgs args){
+        card.Show(args);
     }
 }
